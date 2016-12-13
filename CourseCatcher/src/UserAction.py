@@ -15,14 +15,22 @@ class UserAction:
 		self.user = self.__get_user(id)
 		self.cookie_path = './datas/cookies/cookie' + str(self.id) + '.txt'
 	
-	def login(self):
+	def __get_code(self, is_login):
 		code = ""
 		for i in range(10):
-			os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1 > static/temp/temp_login.jpg  2>static/temp/system_output_temp");
+			if (is_login == True):
+				os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1 > static/temp/temp_login.jpg  2>static/temp/system_output_temp");
+			else:
+				os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg > static/temp/temp_login.jpg  2>static/temp/system_output_temp");
 			md5_ = UserAction.md5_file("static/temp/temp_login.jpg")
 			if (len(VerificationCodeList.objects.filter(md5 = md5_).filter(~Q(code = ''))) > 0):
 				code = VerificationCodeList.objects.get(md5 = md5_).code
 				break
+		return code
+		
+	
+	def login(self):
+		code = self.__get_code(True);
 		if code == '':
 			return False
 		os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/xklogin.do > static/temp/res.html 2>static/temp/system_output_temp");
@@ -77,6 +85,8 @@ class UserAction:
 		c.close()
 		
 	def select_course(self):
+		code = self.__get_code(False);
+		
 		b = StringIO.StringIO() 
 		c = pycurl.Curl() 
 		c.setopt(pycurl.URL, "http://zhjwxkyw.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do?m=rxSearch&p_xnxq=2016-2017-2&tokenPriFlag=rx&is_zyrxk=1")
@@ -120,11 +130,26 @@ class UserAction:
 		b.close() 
 		c.close()
 		if res.find("j_captcha_bks_xk") != -1:
-			f = file('./static/temp/write_code.html', 'w')
-			f.write(res)
-			f.close()
-			print '[need code]'
-			return False
+			if code == '':
+				return False
+			
+			query += "&j_captcha_bks_xk=" + code
+			b = StringIO.StringIO() 
+			c = pycurl.Curl() 
+			c.setopt(pycurl.URL, "http://zhjwxkyw.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do")
+			c.setopt(pycurl.COOKIEFILE, self.cookie_path)
+			c.setopt(pycurl.WRITEFUNCTION, b.write)
+			c.setopt(pycurl.FOLLOWLOCATION, 1) 
+			c.setopt(pycurl.MAXREDIRS, 5)
+			c.setopt(pycurl.POSTFIELDS, query) 
+			c.perform() 
+			status = c.getinfo(c.HTTP_CODE) 
+			res = b.getvalue()
+			b.close() 
+			c.close()
+			
+			#print '[need code]'
+			return True
 		
 		return True
 	

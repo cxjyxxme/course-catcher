@@ -31,4 +31,5 @@ urlpatterns = [
     url(r'^add_task/$', add_task),
 	url(r'^add_courses/$', user_info),
 	url(r'^remove_course/$', remove_course),
+	url(r'^test/$', test),
 ]

@@ -9,6 +9,8 @@ from src.UserAction import UserAction
 from django.db.models import F
 import os
 import django.utils.timezone as timezone
+import pycurl 
+import StringIO 
 
 def index(request):
 	context = get_default_context(request)
@@ -136,8 +138,26 @@ def remove_course(request):
 	response = HttpResponseRedirect('/user_info')
 	return response
 	
-		
-		
+def test(request):
+	action = UserAction(request.COOKIES['user_id'])
+	
+	b = StringIO.StringIO() 
+	c = pycurl.Curl() 
+	c.setopt(pycurl.URL, "http://zhjwxkyw.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do?m=rxSearch&p_xnxq=2016-2017-2&tokenPriFlag=rx&is_zyrxk=1")
+	c.setopt(pycurl.COOKIEFILE, action.cookie_path)
+	c.setopt(pycurl.WRITEFUNCTION, b.write) 
+	c.setopt(pycurl.FOLLOWLOCATION, 1) 
+	c.setopt(pycurl.MAXREDIRS, 5) 
+	c.perform() 
+	status = c.getinfo(c.HTTP_CODE) 
+	res = b.getvalue()
+	posi = res.find('token" value="')
+
+	token = res[posi + 14 : posi + 46]
+	context = {}
+	context['token'] = token
+	return render(request, "test.html", context)
+
 		
 		
 	

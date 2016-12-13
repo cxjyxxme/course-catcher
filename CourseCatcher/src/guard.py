@@ -23,4 +23,4 @@ while True:
 				print "[not enough codes]"
 		action.check_course()
 		
-	time.sleep(2)
+	time.sleep(0.2)
