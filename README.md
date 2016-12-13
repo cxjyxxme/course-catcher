@@ -1,10 +1,11 @@
-# course-catcher
+# Course Catcher
 
 ## Introduction
 A automatic courses selector for Tsinghua University
 
-## Require
+## Requires
 Django
+
 bootstrap
 
 ## How to run
