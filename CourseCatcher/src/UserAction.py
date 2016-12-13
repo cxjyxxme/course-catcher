@@ -8,6 +8,7 @@ from Main.models import VerificationCodeList
 from Main.models import Task
 from hashlib import md5
 from django.db.models import Q  
+import datetime
 
 class UserAction:
 	def __init__(self, id):
@@ -84,9 +85,7 @@ class UserAction:
 		
 		c.close()
 		
-	def select_course(self):
-		code = self.__get_code(False);
-		
+	def select_course(self, code):		
 		b = StringIO.StringIO() 
 		c = pycurl.Curl() 
 		c.setopt(pycurl.URL, "http://zhjwxkyw.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do?m=rxSearch&p_xnxq=2016-2017-2&tokenPriFlag=rx&is_zyrxk=1")
@@ -122,6 +121,9 @@ class UserAction:
 			#!!!!vvvv
 			#query += "&p_rx_xkzy=3"
 		query += "&goPageNumber=1";
+		if code != "":
+			query += "&j_captcha_bks_xk=" + code
+			
 		#print query
 		c.setopt(pycurl.POSTFIELDS, query) 
 		c.perform() 
@@ -130,26 +132,14 @@ class UserAction:
 		b.close() 
 		c.close()
 		if res.find("j_captcha_bks_xk") != -1:
+			print '[need code]'
+			if code != "":
+				return False
+			code = self.__get_code(False);
 			if code == '':
 				return False
+			return self.select_course(code)
 			
-			query += "&j_captcha_bks_xk=" + code
-			b = StringIO.StringIO() 
-			c = pycurl.Curl() 
-			c.setopt(pycurl.URL, "http://zhjwxkyw.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do")
-			c.setopt(pycurl.COOKIEFILE, self.cookie_path)
-			c.setopt(pycurl.WRITEFUNCTION, b.write)
-			c.setopt(pycurl.FOLLOWLOCATION, 1) 
-			c.setopt(pycurl.MAXREDIRS, 5)
-			c.setopt(pycurl.POSTFIELDS, query) 
-			c.perform() 
-			status = c.getinfo(c.HTTP_CODE) 
-			res = b.getvalue()
-			b.close() 
-			c.close()
-			
-			#print '[need code]'
-			return True
 		
 		return True
 	
