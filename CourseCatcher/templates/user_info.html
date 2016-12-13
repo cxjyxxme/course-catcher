@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+	<div class="panel panel-default">
+	  <div class="panel-heading">Add Courses</div>
+	  <div class="panel-body">
+		<form action="/add_task/" method="post">
+			{% csrf_token %}
+			<div class="input-group">
+			  <span class="input-group-addon"><span class="glyphicon glyphicon-th-list"></span></span>
+			  <input type="text" class="form-control" placeholder="Course Number" name="course_id">
+			</div>
+			<div class="input-group">
+			  <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+			  <input type="text" class="form-control" placeholder="Course Sequence" name="course_id2">
+			</div><br>
+			<input type="submit" value="Submit" class="btn btn-default">
+		</form>
+	  </div>
+	</div>
+	<div class="panel panel-default">
+	  <div class="panel-heading">User Informations</div>
+	  <div class="panel-body">
+		<div class="list-group">
+			<a href="#" class="list-group-item"><b>User Name:</b>&nbsp;&nbsp; {{username}}</a>
+			<a href="#" class="list-group-item"><b>User ID:</b>&nbsp;&nbsp; {{user_id}}</a>
+			<a href="#" class="list-group-item"><b>Add Code Times:</b>&nbsp;&nbsp; {{add_code_times}}</a>
+		</div>
+		
+		<table class="table table-striped">
+			<tr>
+				<td>Course number</td>
+				<td>Course sequence</td>
+				<td>Times</td>
+				<td>Selected</td>
+				<td>Delete</td>
+			</tr>
+			{% for task in tasks %}
+				<tr>
+					<td>{{task.course_id}}</td>
+					<td>{{task.course_id2}}</td>
+					<td>{{task.try_times}}</td>
+					<td>{{task.selected}}</td>
+					<td><a href = "/remove_course?id={{task.id}}"><span class="glyphicon glyphicon-trash"></a></span></td>
+				</tr>
+			{% endfor %}
+		</table>
+	  </div>
+	</div>
+{% endblock %}

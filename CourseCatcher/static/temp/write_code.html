@@ -1,0 +1,995 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+<meta http-equiv="Expires" CONTENT="0">
+<meta http-equiv="Cache-Control" CONTENT="no-cache">
+<meta http-equiv="Pragma" CONTENT="no-cache">
+<link type="text/css" href="styles/gbp/theme/blue/menu.css" rel="stylesheet">
+<link type="text/css" href="styles/gbp/datepicker.css" rel="StyleSheet"/>
+<link type="text/css" href="styles/zhjw/grid.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/css.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/default.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/common.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/topmenu.css" rel="stylesheet">
+<script type="text/javascript" src="scripts/grid.js"></script>
+<script type="text/javascript" src="scripts/prototype.js"></script>
+<script type="text/javascript" src="scripts/gbp/page.js"></script>
+<script type="text/javascript" src="scripts/gbp/selectlist.js"></script>
+<script type="text/javascript" src="scripts/gbp/validation.js"></script>
+<script type="text/javascript" src="scripts/gbp/datepicker.js"></script>
+<script type="text/javascript" src="scripts/gbp/menu.js"></script>
+<script type="text/javascript" src="scripts/validator.jsp"></script>
+<script type="text/javascript" src="scripts/zhjw/pubFunction.js"></script>
+
+</head>
+
+
+<link rel="STYLESHEET" type="text/css" href="/styles/zhjw/dhtmlxcombo.css">
+<link href="css/reset.css" rel="stylesheet" type="text/css">
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+<link href="css/css.css" rel="stylesheet" type="text/css">
+<script src="/scripts/dhtmlxcommon.js"></script>
+<script src="/scripts/dhtmlxcombo.js"></script>
+<script type="text/javascript" src="scripts/zhjw/xk.js"></script>
+
+<script src="scripts/zhjw/CJL.0.1.min.js"></script>
+<script type="text/javascript">
+var TableOrder = function(table, options) {
+	this._checked = [];//存放checkbox和radio集合
+	
+	var tBody = $$(table).tBodies[0];
+	this._tBody = tBody;//tbody对象
+	this._rows = $$A.map(tBody.rows, function(o){ return o; });//行集合
+	
+	this._setOptions(options);
+}
+TableOrder.prototype = {
+  _repair: $$B.ie6 || $$B.ie7,//在ie6/7才需要修复bug
+  //设置默认属性
+  _setOptions: function(options) {
+    this.options = {//默认值
+		index:		0,//td索引
+		property:	"innerHTML",//获取数据的属性 
+		type:		"string",//比较的数据类型
+		desc:		true,//是否按降序
+		compare:	null,//自定义排序函数
+		value:		null,//自定义取值函数
+		repair:		this._repair,//是否解决checkbox和radio状态恢复bug
+		onBegin:	function(){},//排序前执行
+		onEnd:		function(){}//排序后执行
+    };
+    $$.extend(this.options, options || {});
+  },
+  //排序并显示
+  sort: function() {
+	//没有排序对象返回
+	if(!arguments.length){ return false };
+	var orders = Array.prototype.slice.call(arguments);
+	//执行附加函数
+	orders[0].onBegin();
+	//排序
+	this._rows.sort($$F.bind( this._compare, this, orders, 0 ));
+	//获取集合
+	var repair = this._repair && $$A.some(orders, function(o){ return o.repair; });
+	repair && this._getChecked();
+	//显示表格
+	var frag = document.createDocumentFragment();
+	$$A.forEach(this._rows, function(o){ frag.appendChild(o); });
+	this._tBody.appendChild(frag);
+	//恢复状态
+	repair && this._setChecked();
+	//执行附加函数
+	orders[0].onEnd();
+  },
+  //比较函数
+  _compare: function(orders, i, tr1, tr2) {
+	var od = orders[i], value1 = this._value(od, tr1), value2 = this._value(od, tr2)
+		,result = od.compare ? od.compare(value1, value2) ://使用自定义排序函数
+			typeof value2 == "string" ? value1.localeCompare(value2) : (value1 - value2);
+	//如果result是0(值相同)同时有下一个排序对象的话继续比较否则根据desc修正结果并返回
+	return !result && od[++i] ? this._compare(orders, i, tr1, tr2) : (od.desc ? -1 : 1) * result;
+  },
+  //获取比较值
+  _value: function(order, tr) {
+	var td = tr.cells[order.index], att = order.property
+		,data = order.value ? order.value(td) ://使用自定义取值函数
+			att in td ? td[att] : td.getAttribute(att);
+	//数据转换
+	switch (order.type.toLowerCase()) {
+		case "int":
+			return parseInt(data, 10) || 0;
+		case "float":
+			return parseFloat(data, 10) || 0;
+		case "date":
+			return Date.parse(data) || 0;
+		case "bool":
+			return data === true || String(data).toLowerCase() == "true" ? 1 : 0;
+		case "string":
+		default:
+			return data.toString() || "";
+	}
+  },
+  //创建并返回一个排序对象
+  creat: function(options) {
+	return $$.extend($$.extend({}, this.options), options || {});
+  },
+  //获取要修正的checkbox和radio集合
+  _getChecked: function() {
+	this._checked = $$A.filter(this._tBody.getElementsByTagName("input"), function(o){
+		return (($$B.ie6 && o.type == "checkbox") || o.type == "radio") &&
+			o.checked != o.defaultChecked;
+	});
+  },
+  //设置checkbox和radio集合的checked
+  _setChecked: function() {
+	$$A.forEach(this._checked, function(o){ o.checked = !o.defaultChecked; });
+  }
+}
+</script>
+
+<style type="text/css">
+.order dd {color:#333;padding-right:15px;cursor:pointer;}
+.odTable .desc, .odTable .asc {background:url(../images/xk/r_2.jpg) right center no-repeat;}
+.odTable .desc {background-image:url(../images/xk/r_1.jpg);}
+</style>
+<!--排序css开始 -->
+<style type="text/css">
+cite, dl, dd, legend  {
+     margin: 0px;
+     padding: 0px;
+}
+#filter dl, #filter dt, #filter dd {
+    float: left;
+    line-height: 26px;
+}
+#filter .order dd {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #cecbce;
+    height: 24px;
+    line-height: 24px;
+    margin-right: 5px;
+    overflow: hidden;
+}
+#filter .order a {
+    display: block;
+    padding: 0 10px;
+}
+</style>
+<!--排序css结束 -->
+
+
+<body style="width:100%;overflow-y:hidden;overflow-x:auto;">
+
+<script type="text/javascript">
+
+
+
+	var z=dhtmlXComboFromSelect("p_kctsm");
+   	z.enableFilteringMode(false);
+   	z.setComboText("");
+   	z.setComboValue("");
+	z.readonly(true);
+</script>
+<script>
+window.dhx_globalImgPath="/images/";
+window.document.title = "Undergraduate course information query";//选课本科生开课信息查询
+function alertMsg(){
+
+
+  showMsg("Please enter correct verification code");
+
+}
+
+function turn(p){//翻页函数
+  document.frm.page.value = p;
+  if(confirmSubmited(document.frm)){
+  	document.frm.m.value="rxSearch";
+    document.frm.submit();
+  }
+}
+
+window.document.onkeydown = function(evt){
+  if(evt == null) evt = window.event;
+  if(evt && evt.srcElement.type && evt.srcElement.type != 'submit' && evt.srcElement.type != 'button' && evt.srcElement.type != 'textarea' && evt.keyCode == 13){
+  	if(evt.srcElement.name == "p_kcm" || evt.srcElement.name == "p_kch" || evt.srcElement.name == "p_kctsm") {
+			doQuery();
+		} else if(evt.srcElement.name == "goPageNumber") {
+			document.frm.go.disabled=true;
+			turn(document.frm.goPageNumber.value);
+		}
+  }
+}
+
+
+function doQuery(methodName){//重新查询
+  var frm = window.document.frm;
+  
+  if(confirmSubmited(document.frm)){
+    document.frm.page.value = "-1";
+    document.frm.m.value = "rxSearch";
+    document.frm.is_zyrxk.value = (methodName ? methodName : "");
+    document.frm.submit();
+  } 
+}
+function doSort(sortParam){//动态排序
+	var methodName="rxSearch";
+    if(document.frm["p_sort.p1"].value == sortParam){
+      document.frm["p_sort.asc1"].value = (document.frm["p_sort.asc1"].value=="true" ? "false" : "true");
+      
+    }else{
+      document.frm["p_sort.p2"].value = document.frm["p_sort.p1"].value;
+      document.frm["p_sort.asc2"].value = document.frm["p_sort.asc1"].value;
+      document.frm["p_sort.p1"].value = sortParam;
+      document.frm["p_sort.asc1"].value = "true";
+      
+    }
+    document.frm.m.value = (methodName ? methodName : "");
+    document.frm.submit();
+}
+function commitRxAdd(){
+  var frm=window.document.frm;
+  var msg="Are you sure to submit course registration?";
+  
+  if(checkRxCommit()&&confirm(msg)){
+  	if(confirmSubmited(frm)){
+      	
+          frm.m.value = "saveRxKc";
+          frm.submit(); 
+    }
+  }
+}
+function checkRxCommit(){
+    var frm=window.document.frm;
+    var bxkCB=document.getElementsByName("p_rx_id");
+    if(bxkCB.length<=0){
+    	alert("No registered course to be submitted");
+    	return false;
+    }
+    if(getCheckedCount(frm.p_rx_id) < 1){
+        alert("Please select a course");
+    	return false;
+    }
+	
+	if(frm.j_captcha_bks_xk.value==""){
+		alert("Verification code cannot be empty");
+		frm.j_captcha_bks_xk.focus();
+		return false;
+	}
+	
+	return true;
+}
+function beforeCommit(){
+		var bxkCB=document.getElementsByName("p_rx_id");
+    var bxkSelect=document.getElementsByName("p_rx_xkzy");
+    for(var i=0;i<bxkCB.length;i++){
+      	if(!bxkCB[i].checked){
+      	  	bxkSelect[i].disabled="disabled";
+      	}
+    }
+}
+function initSelected(){
+	with(document.frm){
+       //出现错误记录，重设上次选择的课程和相关的志愿
+       var bxkCB=document.getElementsByName("p_rx_id");
+       var bxkSelect=document.getElementsByName("p_rx_xkzy");
+       
+   }
+}
+function setInitValue(){
+   initSelected();
+    with(document.frm){
+    p_kkdwnm.value = "";//设置上次选择的开课单位
+//  p_rxklxm.value = "";
+    p_kctsm.value = ""
+  }
+  
+   alertMsg();
+}
+Event.observe(window, "load", setInitValue, false);
+</script>
+
+<!-- 定义列样式，主要是设置列宽度和对齐 -->
+<style>
+body {
+	background-color: #f2f2f2;
+}
+
+
+  .active-column-0 {width : 45px; text-align:center;}
+  .active-column-1 {width : 60px; text-align:center;}
+  .active-column-2 {width : 45px; text-align:center;}
+  .active-column-3 {width : 120px; text-align:left;}
+  .active-column-4 {width : 45px; text-align:center;}
+  .active-column-5 {width : 120px; text-align:left;}
+  .active-column-6 {width : 60px;text-align:left;}
+  .active-column-7 {width : 100px;text-align:left;}
+  .active-column-8 {width : 150px;text-align:left;}
+  .active-column-9 {width : 80px;text-align:center;}
+  .active-column-10 {width : 85px;text-align:center;}
+
+
+.concent .concentright {
+    margin-left: 0 !important;
+}
+
+ .inp1{
+	border: 1px solid #D9D9D9 !important;
+    box-shadow: 1px 1px 1px #E1E1E1 inset;
+    height: 35px !important;
+    padding: 5px 8px;
+    width: 131px;
+}
+
+.tabdiv
+{
+	margin:0px 10px 15px 10px;
+}
+.table1
+{
+	width:100%;
+	background-color:#DDDDDD;
+	font-size:5px !important;
+	color:#777777;
+}
+
+.tdd1
+{
+	text-align:center;
+	background-color:#FFF;
+	padding:5px !important;
+	font-weight:bold; 
+	background:#FFF url(../images/xk/kaikebg_20.png) repeat-x;
+}
+.tdd2
+{
+	text-align:center;
+	background-color:#F4F4F4 !important; 
+	padding:5px !important;
+}
+
+.filterbtn .btnwrap
+{
+	display:inline-block;
+	background:url(../../../images/btnbg.png) repeat-x 0 -60px;
+	*display:inline;
+	border-radius:3px;
+	vertical-align:top;
+}
+
+.filterbtn .btnwrap a
+{
+	float:left;
+	_display:inline;
+	line-height:30px;
+	padding:0 15px;
+	border-right:1px solid #fff;
+}
+
+.filterbtn .btnwrap a.current
+{
+	background:url(../../../images/btnbg.png) repeat-x 0 -30px;
+	color:#fff;
+}
+
+.filterbtn .btnwrap a:hover,.content .filterbtn .btnwrap a.current
+{
+	background:url(../../../images/btnbg.png) repeat-x 0 -30px;
+	color:#fff;
+}
+
+.filterbtn
+{
+	padding:12px 0;
+	text-align:center;
+	border-bottom:1px solid #dfdfdf;
+	background:#fff;
+}
+
+.sousuo1{
+	background: url("../images/xk/souSuobg_16.png") repeat-x scroll 0 0 transparent;
+    border: 1px solid #D9D9D9 !important;
+    border-radius: 3px 3px 3px 3px;
+    color: #7F7F7F;
+    display: block;
+    float: left;
+    font-size: 15px;
+    height: 24px;
+    line-height: 24px;
+    margin: 10px 10px 10px 0;
+    width: 80px;
+    font-family: "Microsoft yahei","微软雅黑","Tahoma","Verdana","Arial","sans-serif";
+}
+
+
+.divright{
+	float:right;
+}
+
+.concent .concentright .keH select{
+	border: 1px solid #D9D9D9;
+    padding: 3px;
+    width: 149px;
+}
+
+</style>
+
+<script>
+
+<!-- 设置表头数据 -->
+var gridColumns = [
+   "Select"//""选择"
+  ,"Course number"//"课程号"
+  ,"Course sequence"//"课序号"
+  ,"Course title"//"课程名"
+	
+   ,"Vacancies"//"课余量"
+  ,"Class time"//"上课时间"
+  ,"Instructor"//"任课教师"
+  ,"Course features"//"课程特色"
+  ,"Remarks"//"选课文字说明"
+  ,"Course department/ school/ college"//"开课系"
+ ,"Secondary course"//"是否二级选课"
+  ];
+
+<!-- 设置排序属性数组数据 -->
+var sortParams = [
+     "" 
+		  ,"id.kch"
+		  ,"id.kxh"
+		  ,"kcm"
+		  
+    ,"bkskyl"
+    ,""
+    ,""
+    ,""
+    ,"xkwzsm"
+    ,"kkdwmc"
+    ,"sfejxk"
+  ];
+
+<!--记录行数的变量-->
+
+<!-- paged变量指示分页显示还是不分页显示。grid.jsp里用到 -->
+
+  
+ 
+
+<!--定义数据行,第一列为选择框-->
+var gridData = [
+    
+      [
+        
+        "<input type='checkbox' name='p_rx_id' value='2016-2017-2;00050083;90;'>"
+        
+        
+		  ,"00050083"
+		  ,"90"
+		  ,
+		  		
+		  			"<a href='js.vjsKcbBs.do?m=showToXs&p_id=1997990033;00050083' class='mainHref' target='_blank'>Fundamental Geology</a>"
+		  		
+		  		
+		  	
+    
+        ,"100"
+        ,"3-6(week 1-16)"
+        ,"王洪涛" 
+        ,""
+        ,"<div title=''></div>"
+        ,"School of Environment"
+        ,"No"
+      ]
+      
+    
+  ];
+
+</script>
+  <form id="frm_sy" name="frm" action="xkBks.vxkBksXkbBs.do" style="margin:0px;" target="_self" method="POST">
+        <input type="hidden" name="m" value="" >
+        <input type="hidden" name="page" value="" >
+        <input type="hidden" name="token" value="61982eaed527917cb6cc0adc66ba4fca">
+        <input type="hidden" name="p_sort.p1" value="">
+		<input type="hidden" name="p_sort.p2" value="">
+		<input type="hidden" name="p_sort.asc1" value="true">
+		<input type="hidden" name="p_sort.asc2" value="true">
+        <input type="hidden" name="p_xnxq" value="2016-2017-2">
+        <input type="hidden" name="is_zyrxk" value="">
+        <input type="hidden" name="tokenPriFlag" value="rx" >
+
+
+    <div class="concent clearfix" style="" id="a">
+        <div class="concentright" style="margin-left:0px;">
+        	
+					
+            
+			<div class="xinXi2 clearfix">
+			    <div class="filterbtn" style="">
+				    <p><div class="btnwrap clearfix" ><a title="Compulsory" id="mod0" href="xkBks.vxkBksXkbBs.do?m=bxSearch&p_xnxq=2016-2017-2&tokenPriFlag=bx">
+							 Select required course<!--选择必修课  --> 
+							 </a>
+			                    <a title="Optional specialty-related courses" id="mod1" href="xkBks.vxkBksXkbBs.do?m=xxSearch&p_xnxq=2016-2017-2&tokenPriFlag=xx">
+							  Select optional specialty-related course<!--选择限选课  -->
+							  </a>
+				                <a class="current" title="Optional" id="mod2" href="xkBks.vxkBksXkbBs.do?m=rxSearch&p_xnxq=2016-2017-2&tokenPriFlag=rx&is_zyrxk=1">
+							  Select optional course<!--选择任选课 -->
+							  </a>
+				                <a title="PE" id="mod3" href="xkBks.vxkBksXkbBs.do?m=tySearch&p_xnxq=2016-2017-2&tokenPriFlag=ty">
+							  PE<!--选择体育课 -->
+							  </a>
+				            
+				                <a title="Repeat" id="mod4" href="xkBks.vxkBksXkbBs.do?m=cxSearchTab&p_xnxq=2016-2017-2&tokenPriFlag=cx">
+							        Select repeated course<!--选择重修课-->
+							    </a>
+				            
+					    </div>
+					 </p>
+			    </div>
+
+			        
+			       
+				
+			
+				    <div class="keH clearfix" style="">
+                        <div>
+					        <p><span class="pad">
+							    Course number<!-- 课程号：--></span><input name="p_kch" id="p_kch" type="text" size="10" class="inp" value="00050083"> &nbsp;
+					        </p>
+					        <p><span class="pad">
+							    Course title<!--课程名：--></span><input name="p_kcm" id="p_kcm" type="text" size="10" class="inp" value=""> &nbsp;
+					        </p>
+					        <p><span>Course department/school/college<!--开课系--></span>
+					            <select name="p_kkdwnm" style="VERTICAL-ALIGN: middle;">
+			     		            <option value="">All departments<!-- 所有系 --></option>
+			      		            
+			      		            
+				    		        <option value="000" title="School of Architecture"> School of Architecture</option>
+				   		            
+				    		        <option value="001" title="Department of Urban Planning & Design"> Department of Urban Planning & Design</option>
+				   		            
+				    		        <option value="002" title="Department of Architecture"> Department of Architecture</option>
+				   		            
+				    		        <option value="003" title="Department of Civil Engineering"> Department of Civil Engineering</option>
+				   		            
+				    		        <option value="004" title="Department of Hydraulic Engineering"> Department of Hydraulic Engineering</option>
+				   		            
+				    		        <option value="005" title="School of Environment"> School of Environment</option>
+				   		            
+				    		        <option value="012" title="Department of Mechanical Engineering"> Department of Mechanical Engineering</option>
+				   		            
+				    		        <option value="013" title="Department of Precision Instrument"> Department of Precision Instrument</option>
+				   		            
+				    		        <option value="014" title="Department of Thermal Engineering"> Department of Thermal Engineering</option>
+				   		            
+				    		        <option value="015" title="Department of Automotive Engineering"> Department of Automotive Engineering</option>
+				   		            
+				    		        <option value="016" title="Department of Industrial Engineering"> Department of Industrial Engineering</option>
+				   		            
+				    		        <option value="021" title="School of Information Science and Technology"> School of Information Science and Technology</option>
+				   		            
+				    		        <option value="022" title="Department of Electrical Engineering"> Department of Electrical Engineering</option>
+				   		            
+				    		        <option value="023" title="Department of Electronic Engineering"> Department of Electronic Engineering</option>
+				   		            
+				    		        <option value="024" title="Department of Computer Science and Technology"> Department of Computer Science and Technology</option>
+				   		            
+				    		        <option value="025" title="Department of Automation"> Department of Automation</option>
+				   		            
+				    		        <option value="026" title="Department of Microelectronics and Nanoelectronics"> Department of Microelectronics and Nanoelectronics</option>
+				   		            
+				    		        <option value="031" title="School of Aerospace Engineering"> School of Aerospace Engineering</option>
+				   		            
+				    		        <option value="032" title="Department of Engineering Physics"> Department of Engineering Physics</option>
+				   		            
+				    		        <option value="034" title="Department of Chemical Engineering"> Department of Chemical Engineering</option>
+				   		            
+				    		        <option value="035" title="School of Materials Science and Engineering"> School of Materials Science and Engineering</option>
+				   		            
+				    		        <option value="042" title="Department of Mathematical Sciences"> Department of Mathematical Sciences</option>
+				   		            
+				    		        <option value="043" title="Department of Physics"> Department of Physics</option>
+				   		            
+				    		        <option value="044" title="Department of Chemistry"> Department of Chemistry</option>
+				   		            
+				    		        <option value="045" title="School of Life Sciences"> School of Life Sciences</option>
+				   		            
+				    		        <option value="046" title="Center for Earth System Science"> Center for Earth System Science</option>
+				   		            
+				    		        <option value="047" title="Institute for Interdisciplinary Information Sciences"> Institute for Interdisciplinary Information Sciences</option>
+				   		            
+				    		        <option value="048" title="Institute for Advanced Study"> Institute for Advanced Study</option>
+				   		            
+				    		        <option value="051" title="School of Economics and Management"> School of Economics and Management</option>
+				   		            
+				    		        <option value="059" title="School of Public Policy and Management"> School of Public Policy and Management</option>
+				   		            
+				    		        <option value="060" title="PBC School of Finance"> PBC School of Finance</option>
+				   		            
+				    		        <option value="063" title="Department of Chinese Language and Literature"> Department of Chinese Language and Literature</option>
+				   		            
+				    		        <option value="064" title="Department of Foreign Languages and Literatures"> Department of Foreign Languages and Literatures</option>
+				   		            
+				    		        <option value="066" title="School of Law"> School of Law</option>
+				   		            
+				    		        <option value="067" title="School of Journalism and Communication"> School of Journalism and Communication</option>
+				   		            
+				    		        <option value="068" title="School of Marxism"> School of Marxism</option>
+				   		            
+				    		        <option value="069" title="School of Humanities"> School of Humanities</option>
+				   		            
+				    		        <option value="070" title="School of Social Sciences"> School of Social Sciences</option>
+				   		            
+				    		        <option value="072" title="Division of Sports Science and physical education"> Division of Sports Science and physical education</option>
+				   		            
+				    		        <option value="075" title="Library"> Library</option>
+				   		            
+				    		        <option value="078" title="Art Center"> Art Center</option>
+				   		            
+				    		        <option value="080" title="Academy of Arts & Design"> Academy of Arts & Design</option>
+				   		            
+				    		        <option value="090" title="School of Civil Engineering"> School of Civil Engineering</option>
+				   		            
+				    		        <option value="091" title="Department of Construction Management"> Department of Construction Management</option>
+				   		            
+				    		        <option value="097" title="Schwarzman College，Tsinghua University"> Schwarzman College，Tsinghua University</option>
+				   		            
+				    		        <option value="099" title="Department of Building Science"> Department of Building Science</option>
+				   		            
+				    		        <option value="101" title="Institute of Nuclear and New Energy Technology"> Institute of Nuclear and New Energy Technology</option>
+				   		            
+				    		        <option value="103" title="Institute of Education"> Institute of Education</option>
+				   		            
+				    		        <option value="112" title="Information Networks Engineering Research Center"> Information Networks Engineering Research Center</option>
+				   		            
+				    		        <option value="151" title="Fundamental Industry Training Center of Tsinghua University"> Fundamental Industry Training Center of Tsinghua University</option>
+				   		            
+				    		        <option value="155" title="Electrical Engineering and Electronics Experiment Teaching Center"> Electrical Engineering and Electronics Experiment Teaching Center</option>
+				   		            
+				    		        <option value="205" title="Publicity Department of Party Committee"> Publicity Department of Party Committee</option>
+				   		            
+				    		        <option value="207" title="Student Department of Party Committee"> Student Department of Party Committee</option>
+				   		            
+				    		        <option value="209" title="Military Office of Party Committee "> Military Office of Party Committee </option>
+				   		            
+				    		        <option value="255" title="Graduate School"> Graduate School</option>
+				   		            
+				    		        <option value="291" title="Graduate School at Shenzhen, Tsinghua University"> Graduate School at Shenzhen, Tsinghua University</option>
+				   		            
+				    		        <option value="305" title="Tsinghua University Hospital"> Tsinghua University Hospital</option>
+				   		            
+				    		        <option value="400" title="School of Medicine"> School of Medicine</option>
+				   		            
+				    		        <option value="402" title="School of Pharmaceutical Sciences"> School of Pharmaceutical Sciences</option>
+				   		            
+				    		        <option value="403" title="Department of Biomedical Engineering"> Department of Biomedical Engineering</option>
+				   		            
+				    		        <option value="410" title="School of Software"> School of Software</option>
+				   		            
+				    		        <option value="470" title="Xinya College"> Xinya College</option>
+				   		            
+				    		        <option value="600" title="Tsinghua-UC Berkeley Shenzhen Institute"> Tsinghua-UC Berkeley Shenzhen Institute</option>
+				   		            
+				  	            </select>
+					        </p> <br>
+
+                            <div style="float:left;width:100%" align="center">
+
+					            <p><span>Course features<!--课程特色  --></span>
+						            <select name="p_kctsm" id="p_kctsm" style="width: 140px;">
+			  			                <option value=""></option>
+			  			                
+			  			                
+			  				            <option value="15" title=""></option>
+			  			                
+			  				            <option value="08" title=""></option>
+			  			                
+			  				            <option value="09" title=""></option>
+			  			                
+			  				            <option value="16" title=""></option>
+			  			                
+			  				            <option value="01" title="Taught in foreign language">Taught in foreign language</option>
+			  			                
+			  				            <option value="03" title="mainly taught in Chinese (bilingual course)">mainly taught in Chinese (bilingual course)</option>
+			  			                
+			  				            <option value="02" title="≥50% taught in foreign language (bilingual course)">≥50% taught in foreign language (bilingual course)</option>
+			  			                
+			  				            <option value="13" title=""></option>
+			  			                
+			  				            <option value="12" title=""></option>
+			  			                
+			  				            <option value="06" title="Core course of cultural quality">Core course of cultural quality</option>
+			  			                
+			  				            <option value="10" title="Experiment course">Experiment course</option>
+			  			                
+			  				            <option value="14" title=""></option>
+			  			                
+			  				            <option value="04" title="Freshman seminar">Freshman seminar</option>
+			  			                
+			  				            <option value="11" title="Practice course">Practice course</option>
+			  			                
+			  				            <option value="05" title="Thematic seminar">Thematic seminar</option>
+			  			                
+			  				            <option value="07" title=""></option>
+			  			                
+						            </select>
+					            </p>
+
+
+
+                                <p>
+                                    <div class="divright">
+                                        <input name="submit1" type="reset" style="border: 1 none;" class="sousuo1" value="Cancel" />&nbsp;&nbsp;
+                                    </div>
+                                    <div class="divright">
+                                        <input name="submit1" type="button" onclick="commitRxAdd()" style="border: 1 none;" class="sousuo1" value="Submit" />&nbsp;&nbsp;
+                                    </div>
+                                    <div class="divright">
+                                        <input name="bt" type="button" class="sousuo1" style="width:auto; text-align:center;border: 1 none" value="View optional courses of your major" onclick="doQuery('1');">&nbsp;
+                                    </div>
+                                    <div class="divright">
+                                        <input name="bt" type="button" class="sousuo1" value="Search" onclick="doQuery();">&nbsp;&nbsp;
+                                    </div>
+                                </p>
+
+  					        </div>
+  					        <input type="hidden" name="p_rxklxm" value="">
+  					       
+				            <div class="tabdiv" style="float: left; padding: 10px; width: 97%;">
+
+
+                                <div style="margin-right: 17px;">
+                                  
+   
+      <table border="0" cellspacing="0" cellpadding="0" class="odTable" >
+	  <tr>
+	    <td style="padding:2px">
+             <div id="filter" clstag="thirdtype|keycount|thirdtype|filter">
+		       <div class="fore1">
+			    <dl class="order">
+				<dt>Sort by：</dt>
+				
+				<dd  ><a href="#" onclick="doSort('bkskyl');">Vacancies</a><b></b></dd>
+				
+				
+				
+				
+			   </dl>			
+		      </div>
+	         </div>
+        </td>
+      </tr>
+    </table>
+    
+                                    <table class="table1 odTable" border="0" cellpadding="0" cellspacing="1"  id="table_h">
+                                     <thead>
+						                <tr class="trr1">
+                                            <td class="tdd1" width="6%" style="text-align:center;"><span class="trunk"  style="padding-right:0px;float:none;">Select</span></td>
+                                            <td class="tdd1" width="7%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">Course number</span></td>
+                                            <td class="tdd1" width="5%" style="text-align:center;"><span class="kxh" style="padding-right:0px;float:none;">Course sequence</span></td>
+							                <td class="tdd1" width="16%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">Course title</span></td>
+							                
+                                            
+                                            <td class="tdd1" width="6%" style="text-align:center;"><span  class="kyl" style="padding-right:0px;float:none;">Vacancies</span></td>
+                                            
+                                             
+                                            <td class="tdd1" width="11%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">Class time</span></td>
+                                            <td class="tdd1" width="7%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">Instructor</span></td>
+                                            <td class="tdd1" width="8%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">Course features</span></td>
+                                            <td class="tdd1" width="9%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">Remarks</span></td>
+                                            <td class="tdd1" width="10%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">Course department/ school/ college</span></td>
+                                            <td class="tdd1" width="4%" style="text-align:center;"><span class="sfejxk" >Secondary course</span></td>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                
+                                <div id="content_1" style="width:100%;height: 165px;overflow-y: scroll;overflow-x:hidden;margin-right:0px;">
+
+                                    <table class="table1 odTable" border="0" cellpadding="0" cellspacing="1" id="table_t">
+<tbody>
+						                
+                                        <tr class="trr2">
+                                            <td class="tdd2" width="6%" style="text-align:center;">
+							                
+								                <input type='checkbox' name='p_rx_id' value='2016-2017-2;00050083;90;'>
+							                
+							                
+							                </td>
+                                            <td class="tdd2"  width="7%" style="text-align:center;"><span  style="padding-right:0px;float:none;">00050083</span></td>
+                                            <td class="tdd2" width="5%" style="text-align:center;"><span  style="padding-right:0px;float:none;">90</span></td>
+                                            <td class="tdd2" width="16%" style="text-align:left;" title="Fundamental Geology">
+							                
+		  							                
+		  								                <a href='js.vjsKcbBs.do?m=showToXs&p_id=1997990033;00050083' class='mainHref' target='_blank'>
+    
+    Fundamental Geology
+    </a>
+		  							                
+		  							                
+		  						                
+							                </td>
+							                
+                                            <td class="tdd2" width="6%" style="text-align:center;" _order="100"><span  style="padding-right:0px;float:none;">100</span></td>
+							                <td class="tdd2" width="11%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">3-6(week 1-16)</span></td>
+							                <td class="tdd2" width="7%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">王洪涛</span></td>
+							                <td class="tdd2" width="8%" style="text-align:center;">
+											
+			
+			
+			
+				
+						
+				
+			
+											
+	<!--
+        <span class="trunk trunk2" style="padding-right:0px;float:none;" title=""> </span>
+		--->
+							                </td>
+							                <td class="tdd2" width="9%" style="text-align:center;"><div title=''><span class="trunk" style="float:none;padding-right:0px;"></span></div></td>
+							                <td class="tdd2" width="10%" style="text-align:center;"><span class="trunk" style="padding-right:0px;float:none;">School of Environment</span></td>
+							                <td class="tdd2" width="4%" style="text-align:center;"><span  style="padding-right:0px;float:none;">No</span></td>
+                                        </tr>
+                                        
+						                
+						                </tbody>
+                                    </table>
+
+                                </div>
+                                
+			                    
+			
+			                    
+			
+                                    <!-- 没有记录时显示给用户提示信息 -->
+                                    
+
+                                    <!-- 不分页时显示总记录个数 -->
+                                    
+
+                                    <!-- 分页显示时显示分页信息 -->
+                                    
+	                                    <p class="yeM yahei" style="float:right">
+		                                    <a href="javascript:turn(1);" id="firstpage" style="border-left: 1px solid #D4D4D4;">First</a><a href='javascript:turn(0);' id="uppage">Previous</a><a href='javascript:turn(1);' id="nextpage">Next</a><a href='javascript:turn(1);' id="endpage">Last</a>
+                                            &nbsp;
+					                        Page 1  / Total 1 page (Total 1 records )
+						                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					                        <input type="text" name="goPageNumber"  class="inputbox" value='1' size="2">&nbsp;
+					                        <input type="button" id="go" class="sousuobt" onclick="document.frm.go.disabled=true;turn(document.frm.goPageNumber.value);" value="GO">&nbsp;&nbsp;
+					
+	                                    </p>
+	
+                                    
+			                    
+			                </div>
+                            
+                            
+                                <tr height="40">
+	                                <td>
+		                                <table width="100%" border="0" cellpadding="0" cellspacing="1" bgcolor="#FFFFFF" class="table_title_zi25">
+			                                <tr>
+				                                <td>
+					                                <table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#F2F2F2">
+						                                <tr><td bgcolor="#F2F2F2">
+						                                    &nbsp;&nbsp;Verification code&nbsp;
+						                                    <input name="j_captcha_bks_xk" type="text" class="text">&nbsp;&nbsp;<img id="captcha" src="/login-jcaptcah.jpg" align="top">
+						                                    </td>
+                                                        </tr>
+					                                </table>
+				                                </td>
+			                                </tr>
+		                                </table>
+	                                </td>
+                                </tr>
+                            
+	                    </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+  </form>
+
+    <script>
+     window.onload = function(){
+    parent.document.all("iframe1").style.height=this.document.getElementById("a").offsetHeight+30;
+    }
+    </script>
+</body>
+    <script type="text/javascript" src="jxmh/js/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="jxmh/js/trunk8.js"></script>
+    <script>
+    $('.trunk').trunk8();
+    $(window).resize(function(){
+    $('.trunk').trunk8();
+    $(".trunk2").each(function(){
+    var title = $(this).attr("title");
+    var t = $(this).text();
+    if(t.length > 1){
+    if(title==""){
+    $(this).attr("title",t);
+    $(this).text(t.substring(0,6)+"...");
+    }else{
+    $(this).text(t.substring(0,6)+"...");
+    }
+    }
+    });
+    });
+    $(function(){
+    $(".trunk2").each(function(){
+    var title = $(this).attr("title");
+    var t = $(this).text();
+    if(t.length > 1){
+    if(title==""){
+    $(this).attr("title",t);
+    $(this).text(t.substring(0,6)+"...");
+    }else{
+    $(this).text(t.substring(0,6)+"...");
+    }
+    }
+    });
+    });
+    
+     $(function(){
+        var sfejxk =  $(".sfejxk").text();
+        if(sfejxk.length >1){
+            $(".sfejxk").parent().attr("title",sfejxk);
+            $(".sfejxk").text(sfejxk.substring(0,1)+".");
+        }
+    var kxh =  $(".kxh").text();
+    if(kxh.length > 3){
+            $(".kxh").parent().attr("title",kxh);
+            $(".kxh").text(kxh.substring(0,3)+"...");
+        }
+    var kyl =  $(".kyl").text();
+    if(kyl.length > 3){
+            $(".kyl").parent().attr("title",kyl);
+            $(".kyl").text(kyl.substring(0,3)+"...");
+        } 
+
+    });
+    </script>
+    
+    
+    <script type="text/javascript">
+var to = new TableOrder("table_t"), odID = to.creat({ type: "int", desc: false }), arrOrder = [];
+
+function ClearCss(){ $$A.forEach(arrOrder, function(o){ o.className = ""; }); }
+
+function SetCheck(td){ return td.getElementsByTagName("input")[0].checked; }
+
+$$A.forEach([
+	 
+	  
+	["kylpx", { index: 4 , property: "_order", type: "int" }],
+	 
+	
+], function (arr){
+	var o = $$(arr[0]), order = to.creat(arr[1]);
+	order.onBegin = function(){ ClearCss(); odID.desc = this.desc; }
+	order.onEnd = function(){
+		o.className = this.desc ? "desc" : "asc";//设置样式
+		this.desc = !this.desc;//取反排序
+	}
+	o.onclick = function(){ to.sort(order, odID); }
+	arrOrder.push(o);//记录排序项目（这里主要用来设置样式）
+});
+</script>

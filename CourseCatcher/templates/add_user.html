@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+	<form action="/deal_add_user/" method="post">
+		{% csrf_token %}
+		<div class="input-group">
+		  <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+		  <input type="text" class="form-control" placeholder="Student ID" name="username">
+		</div>
+		<div class="input-group">
+		  <span class="input-group-addon"><span class="glyphicon glyphicon-asterisk"></span></span>
+		  <input type="password" class="form-control" placeholder="Password" name="password">
+		</div><br>
+		<input type="submit" value="Submit" class="btn btn-default">
+	</form>
+{% endblock %}

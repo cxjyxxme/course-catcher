@@ -1,0 +1,189 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<!--<!DOCTYPE HTML>-->
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Expires" CONTENT="0">
+<meta http-equiv="Cache-Control" CONTENT="no-cache">
+<meta http-equiv="Pragma" CONTENT="no-cache">
+<link type="text/css" href="styles/gbp/theme/blue/menu.css" rel="stylesheet">
+<link type="text/css" href="styles/gbp/datepicker.css" rel="StyleSheet"/>
+<link type="text/css" href="styles/zhjw/grid.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/css.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/default.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/common.css" rel="stylesheet">
+<link type="text/css" href="styles/zhjw/topmenu.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="/components/jquery-easyui-1.3.4/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="/components/jquery-easyui-1.3.4/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../demo.css">
+<script type="text/javascript" src="/components/jquery-easyui/jquery.min.js"></script>
+<script type="text/javascript" src="/components/jquery-easyui-1.3.4/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/components/jquery-easyui-1.3.4/jquery.validatebox.fixed.js"></script>
+<script type="text/javascript" src="/components/jquery-easyui-1.3.4/locale/easyui-lang-zh_CN.js" charset="utf-8"></script>
+<script type="text/javascript" src="/components/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="scripts/grid.js"></script>
+<script type="text/javascript" src="scripts/prototype.js"></script>
+<script type="text/javascript" src="scripts/gbp/page.js"></script>
+<script type="text/javascript" src="scripts/gbp/selectlist.js"></script>
+<script type="text/javascript" src="scripts/gbp/validation.js"></script>
+<script type="text/javascript" src="scripts/gbp/datepicker.js"></script>
+<script type="text/javascript" src="scripts/gbp/menu.js"></script>
+<script type="text/javascript" src="scripts/validator.jsp"></script>
+<script type="text/javascript" src="scripts/zhjw/pubFunction.js"></script>
+
+
+
+</head>
+
+<body class="infoBody">
+
+
+
+
+
+<style type="text/css">
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+}
+#main {
+	width:100%;
+	margin:auto;
+}
+#head {
+	width:565px;
+	height:377px;
+	background:url(/image/bg.jpg) no-repeat;
+	margin:auto;
+}
+#headyw {
+	width:565px;
+	height:377px;
+	background:url(/image/bg-yw.jpg) no-repeat;
+	margin:auto;
+}
+#head .table {
+	margin-left:120px;
+	margin-right:120px;
+}
+.STYLE1 {
+	color: #2D4051
+}
+#button {
+	border:0;
+	margin-left:120px;
+	margin-right:35px;
+}
+</style>
+
+
+
+
+<script>
+function doLogin(){
+  var frm = window.document.frm;
+  if(isEmpty(frm.j_username.value)){
+    alert("The user name cannot be empty!");
+    frm.j_username.focus();
+    return;
+  }
+  if(confirmSubmited(frm)){ 
+    frm.submit();
+  }
+}
+
+//初始化函数
+function init(){
+  window.document.title = "Elective login";
+  window.document.frm.j_username.focus();
+}
+Event.observe(window, "load", init, false);
+</script>
+
+<br><br>
+
+
+
+<form name="frm" action=https://zhjwxkyw.cic.tsinghua.edu.cn:443/j_acegi_formlogin_xsxk.do method="post">
+<div id="main" align="center">
+ 
+   <div id="headyw">
+   
+    <div class="table">
+      <table  border="0" width="65%" cellspacing="8" cellpadding="0" style="padding-top:150px;margin-top:150px">
+        <tr>
+          <td width="25%" height="24"><span class="STYLE1">Username<!--用户名--></span></td>
+          <td width="50%"><label>
+            <input type="input" name="j_username" id="j_username" />
+            </label></td>
+          <td width="25%">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="STYLE1">Password<!--密&nbsp;码--></td>
+          <td><label>
+            <input type="password" name="j_password" id="j_password" />
+            </label></td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="STYLE1">Verification code<!--验证码--></td>
+          <td><label>
+     <input name="captchaflag" type="hidden" value="login1">
+     <input name="_login_image_" type="input">
+             
+            </label></td>
+          <td><img id="captcha" src="/login-jcaptcah.jpg?captchaflag=login1" width="90" height="30">  </td>
+        </tr>
+      </table>
+    </div>
+    <div id="button">
+      <table width="50%" border="0" align="right" cellpadding="0" cellspacing="8" style="margin-top:50px;">
+        <tr>
+          <td><a href="#" onClick="doLogin();"><img src="/image/button-1-yw.jpg" width="98" height="36" border="0" /></a></td>
+          <td><a href="#" onClick="reset();"><img src="image/button-2-yw.jpg" width="98" height="36" border="0" /></a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<div  align="center">
+	<br>
+<a  style="color:red;font-size:16px;">
+Internet browsers such as IE and Firefox are recommended during course registration and course drop<!--建议使用IE、Firefox浏览器进行选、退课操作-->
+
+</br>Service Call:62771940/51775940
+
+</a>
+
+</div>
+</form>
+<!--依据浏览器来提示用户-->
+<script type="text/javascript">
+var browser=navigator.appName
+var b_version=navigator.appVersion
+var version=parseFloat(b_version)
+if ((browser=="Microsoft Internet Explorer") && (version<=4))
+{
+  alert("浏览器版本低，建议用户更换浏览器");
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block mainbody %}
+	<img src = '{% static "images/codes/"%}{{code_path}}' />
+	<br>
+	<form action="/deal_add_code/" method="post">
+		{% csrf_token %}
+		<input type="hidden" name="code_id" value="{{code_id}}">
+		<input type="text" class="form-control" name="code" placeholder="Press <Enter> to Submit" autofocus="autofocus" style="width:200px; margin:10px 0px 10px 0px">
+		<input type="submit" value="Submit" style = "width:200px">
+	</form>
+{% endblock %}
