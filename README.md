@@ -1,8 +1,7 @@
 # Course Catcher
 
 ## Introduction
-A automatic courses selector for Tsinghua University
-
+A automatic courses selector
 ## Requires
 Django
 
