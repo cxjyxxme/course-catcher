@@ -1,13 +1,13 @@
-# Course Catcher #
+# Course Catcher
 
-## Introduction ##
+## Introduction
 A automatic courses selector
-## Requires ##
+## Requires
 Django
 
 bootstrap
 
-## How to run ##
+## How to run
 	python manage.py runserver 0.0.0.0:8000
 	python manage.py shell
 	import src.guard
