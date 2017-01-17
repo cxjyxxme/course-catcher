@@ -1,7 +1,7 @@
 # Course Catcher #
 
 ## Introduction ##
-A automatic courses selector
+An automatic courses selector
 ## Requires ##
 Django
 
