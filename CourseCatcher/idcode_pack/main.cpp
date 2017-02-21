@@ -108,7 +108,7 @@ info predict(Mat t1,Mat t2,Mat x){
 			max=save;
 			res=i;
 		}
-		if (!MODE) printf("%.3f ",save);
+		//if (!MODE) printf("%.3f ",save);
 	}
 	return info(res,max);
 }
@@ -231,7 +231,7 @@ void work(int t,const char* imagename,int bo){
 	if (MODE) memcpy(a,"images\\",sizeof(char)*8);
 	strcat(a,imagename);
     img[t] = imread(a);
-	imshow("img",img[t]);
+	//imshow("img",img[t]);
 	//²Ã±ß
 	resize(img[t],res,Size(C,R),0,0,CV_INTER_LINEAR);
 	for (int i=0;i<R;i++)
@@ -333,7 +333,7 @@ void work(int t,const char* imagename,int bo){
 				for (int k=0;k<3;k++)
 					res3.at<Vec3b>(i-x1,j-y1)[k]=res2.at<Vec3b>(i,j)[k];
 		char ch=imagename[l];
-		printf("%c",ch);
+		//printf("%c",ch);
 		++cnt[ch];
 		name="ans3/";
 		name+=ch;
@@ -349,7 +349,7 @@ void work(int t,const char* imagename,int bo){
 
 		lastx=add;
 	}
-	printf("\n");
+	//printf("\n");
 	//printf("finish");
     //waitKey();
 }
@@ -384,11 +384,11 @@ double makeAns(){
 		if (n==4) ans1[i]=chs[save.t];
 		else ans2[i]=chs[save.t];
 		acr+=save.p;
-		if (!MODE) printf("\n%c\n",n==4 ? ans1[i] : ans2[i]);
+		//if (!MODE) printf("\n%c\n",n==4 ? ans1[i] : ans2[i]);
 	}
 	acr=acr/(double)n;
-	for (int i=0;i<n;i++) printf("%c",n==4 ? ans1[i] : ans2[i]);
-	printf("\n");
+	//for (int i=0;i<n;i++) printf("%c",n==4 ? ans1[i] : ans2[i]);
+	//printf("\n");
 	if (!MODE && DEBUG) fclose(stdout);
 	return acr;
 }

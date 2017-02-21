@@ -26,7 +26,7 @@ while True:
 		times += 1
 		if times % 10 == 0:
 			action.check_course()
-	#time.sleep(0.2)
+	time.sleep(0.2)
 	
 	
 	#t0 = datetime.datetime.now()

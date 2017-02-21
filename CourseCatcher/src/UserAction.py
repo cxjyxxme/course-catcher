@@ -19,16 +19,17 @@ class UserAction:
 	def __get_code(self, is_login):
 		code = ""
 		if (is_login == True):
-			os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1 > idcode_pack/test.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
+			os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1 > test.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
 		else:
-			os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg > idcode_pack/test.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
+			os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg > test.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
 		os.system("./idcode_pack/DisplayImage")
 		
-		file_object = open('idcode_pack/ans.txt')
+		file_object = open('ans.txt')
 		try:
 			 code = file_object.read( )
 		finally:
 			 file_object.close( )
+		print code
 		return code
 		
 	
