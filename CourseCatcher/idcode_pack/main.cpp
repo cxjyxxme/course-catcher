@@ -250,7 +250,7 @@ void work(int t,const char* imagename,int bo){
 	if (DEBUG) imwrite("out2.jpg",res);
 	
 	//ШЅды
-	int bo=1;
+	bo=1;
 	while (bo){
 		bo=0;
 		for (int i=0;i<R;i++)

@@ -16,13 +16,16 @@ while True:
 	for user in users:
 		user_actions.append(UserAction(user.id))
 	
+	times = 0
 	for action in user_actions:
 		print '[' + str(action.id) + ' : select course]'
 		if not action.select_course(""):
 			print '[' + str(action.id) + ' : login]'
 			if not action.login():
 				print "[not enough codes]"
-		#action.check_course()
+		times += 1
+		if times % 10 == 0:
+			action.check_course()
 	#time.sleep(0.2)
 	
 	

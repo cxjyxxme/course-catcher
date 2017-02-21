@@ -33,6 +33,8 @@ def deal_add_user(request):
 		user.save()
 		act = UserAction(user.id)
 		act.get_cookie()
+		os.system("mkdir static/temp/" + str(user.id) + " 2>static/temp/system_output_temp");
+			
 		
 		response = HttpResponseRedirect('/login')
 		return response
@@ -98,6 +100,7 @@ def add_code(request):
 			if (len(VerificationCodeList.objects.filter(md5 = md5_)) == 0):
 				has_code = True
 				break
+			print "233"
 		if has_code:
 			md5_ = UserAction.md5_file("static/temp/temp.jpg")
 			code = VerificationCodeList(md5 = md5_, last_ask_time = timezone.now())
