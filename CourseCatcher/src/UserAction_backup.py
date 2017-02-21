@@ -18,17 +18,15 @@ class UserAction:
 	
 	def __get_code(self, is_login):
 		code = ""
-		if (is_login == True):
-			os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1 > idcode_pack/test.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
-		else:
-			os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg > idcode_pack/test.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
-		os.system("./idcode_pack/DisplayImage")
-		
-		file_object = open('idcode_pack/ans.txt')
-		try:
-			 code = file_object.read( )
-		finally:
-			 file_object.close( )
+		for i in range(10):
+			if (is_login == True):
+				os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg?captchaflag=login1 > static/temp/" + str(self.id) + "/temp_login.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
+			else:
+				os.system("curl -b " + self.cookie_path + " http://zhjwxkyw.cic.tsinghua.edu.cn/login-jcaptcah.jpg > static/temp/" + str(self.id) + "/temp_login.jpg  2>static/temp/" + str(self.id) + "/system_output_temp");
+			md5_ = UserAction.md5_file("static/temp/" + str(self.id) + "/temp_login.jpg")
+			if (len(VerificationCodeList.objects.filter(md5 = md5_).filter(~Q(code = ''))) > 0):
+				code = VerificationCodeList.objects.get(md5 = md5_).code
+				break
 		return code
 		
 	
